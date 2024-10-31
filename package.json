@@ -1,0 +1,30 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "Backend of Todo App",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sourav19o7/TODO.git"
+  },
+  "keywords": [
+    "Todo"
+  ],
+  "author": "Sourav",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sourav19o7/TODO/issues"
+  },
+  "homepage": "https://github.com/Sourav19o7/TODO#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "mysql": "^2.18.1",
+    "nodemon": "^3.1.7"
+  }
+}
