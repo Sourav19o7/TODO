@@ -1,19 +1,26 @@
 {
-  "name": "todo",
+  "name": "todo-backend",
   "version": "1.0.0",
-  "description": "Backend of Todo App",
-  "main": "server.js",
+  "description": "Backend for the Todo App, built with Node.js and MySQL.",
+  "main": "src/app.js",
   "scripts": {
-    "test": "npm test",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "test": "echo \"No test specified\" && exit 1",
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sourav19o7/TODO.git"
+    "url": "https://github.com/Sourav19o7/TODO.git"
   },
   "keywords": [
-    "Todo"
+    "todo",
+    "backend",
+    "nodejs",
+    "express",
+    "mysql"
   ],
   "author": "Sourav",
   "license": "ISC",
@@ -22,11 +29,27 @@
   },
   "homepage": "https://github.com/Sourav19o7/TODO#readme",
   "dependencies": {
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "mysql": "^2.18.1",
-    "mysql2": "^3.11.4",
+    "mysql2": "^3.11.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-react": "^7.37.2",
+    "globals": "^15.12.0",
+    "husky": "^8.0.0",
     "nodemon": "^3.1.7"
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "env": {
+      "node": true,
+      "es2021": true
+    }
   }
 }
