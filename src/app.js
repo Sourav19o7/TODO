@@ -1,15 +1,11 @@
-require('dotenv').config();
-const { createClient } = require('@supabase/supabase-js');
+const express = require('express')
+const app = express()
+const port = process.env.PORT || 4000;
 
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-
-// Example function to fetch data
-async function fetchData() {
-  // Get row count
-    const { data, error } = await supabase.from('second_brain').select('*');
-    if (error) console.error(error);
-    else console.log("Data" , data);
-}
-
-fetchData();
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
