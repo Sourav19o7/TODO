@@ -1,19 +1,15 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const taskRoutes = require('./routes/taskRoutes');
-
 require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
 
-const app = express();
-const PORT = process.env.PORT || 8080;
 
-// Middleware
-app.use(bodyParser.json());
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-// Routes
-app.use('/api/tasks', taskRoutes);
+// Example function to fetch data
+async function fetchData() {
+  // Get row count
+    const { data, error } = await supabase.from('second_brain').select('*');
+    if (error) console.error(error);
+    else console.log("Data" , data);
+}
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+fetchData();
