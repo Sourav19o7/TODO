@@ -11,7 +11,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Example function to fetch data
 async function fetchData() {
-    const { data, error } = await supabase.from('your_table_name').select('*');
+    const { data, error } = await supabase.from('second_brain').select('*');
     if (error) {
         console.error('Error fetching data:', error);
         return { error: error.message };
