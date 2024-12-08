@@ -1,7 +1,8 @@
-const successResponse = (res, data, statusCode = 200) => {
-    return res.status(statusCode).json({
-      success: true,
-      data,
+const successResponse = (res, id = 1, message, data = undefined) => {
+    return res.status(200).json({
+      id : id,
+      message : message,
+      data : data,
     });
   };
   

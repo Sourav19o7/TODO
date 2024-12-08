@@ -1,11 +1,33 @@
 require('dotenv').config();
+const verifyToken = require('./middleware/authMiddleware');
 const express = require('express');
 const userRoutes = require('./routes/userRoutes');
+const morgan = require('morgan');
+const helmet = require('helmet');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const color = require('colors');
 
 const app = express();
 
-app.use(express.json());
-app.use('/api', userRoutes);
+// Middleware
+app.use(morgan("dev"));
+app.use(helmet());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
+
+color.setTheme({
+  info: "green",
+  warn: "yellow",
+  db: "bgYellow",
+  error: "bgRed",
+  debug: "blue",
+  connected: "bgCyan",
+});
+
+app.use(verifyToken)
+app.use('/user', userRoutes);
 
 const PORT = process.env.PORT || 3000;
 
