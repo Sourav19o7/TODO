@@ -41,8 +41,6 @@ const sendMail = async (email, otp) => {
       </body>
       </html>
     `;
-  
-    console.log(email, otp, process.env.SENDGRID_API_KEY)
     const msg = {
       to: email,
       from: 'sourav.dey0147@gmail.com',
