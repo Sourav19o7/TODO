@@ -1,40 +1,78 @@
 require('dotenv').config();
 const userRepository = require('../repositories/userRepository');
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const emailService = require('./emailService');
 
+/**
+ * Retrieves a user by their email.
+ * @param {string} email - The user's email address.
+ * @returns {Object|null} - The user object if found, otherwise null.
+ */
 const retrieveUserByEmail = async (email) => {
   if (!email) {
-    return null;
+    throw new Error('Email is required');
   }
-  const user = await userRepository.getUserByEmail(email);
-  return user;
+  return await userRepository.getUserByEmail(email);
 };
 
+/**
+ * Sends an OTP to the user's email.
+ * @param {string} email - The recipient's email address.
+ * @returns {Object} - The response from the email service.
+ */
 const sendEmailOTP = async (email) => {
-  resend.emails.send({
-    from: 'sourav.dey0147@gmail.com',
-    to: email,
-    subject: 'Hello World',
-    html: 'Hey Omkar'
-  });
-}
-
-const verifyEmailOTP = async (email, otp) => {
-  return false;
-}
-
-const saveUser = async (user) => {
-  if (!user) {
-    return null;
+  if (!email) {
+    throw new Error('Email is required for sending OTP');
   }
-  const newUser = await userRepository.saveUser(user);
-  return newUser;
+  
+  try {
+    const response = await emailService.sendMail(email);
+    console.log('Email sent response:', response);
+    return { success: true, message: 'OTP sent successfully' };
+  } catch (error) {
+    console.error('Error sending email OTP:', error.message);
+    throw new Error('Failed to send OTP. Please try again later.');
+  }
 };
+
+/**
+ * Verifies the OTP sent to the user's email.
+ * @param {string} email - The user's email address.
+ * @param {string} otp - The OTP to verify.
+ * @returns {boolean} - True if OTP is verified, otherwise false.
+ */
+const verifyEmailOTP = async (email, otp) => {
+  if (!email || !otp) {
+    throw new Error('Email and OTP are required for verification');
+  }
+
+  // Placeholder logic for OTP verification. Replace with actual validation logic.
+  const isValidOTP = otp === '123456'; // Example: Compare with a stored OTP or service.
+  console.log(`Verifying OTP for ${email}: ${isValidOTP}`);
+  return isValidOTP;
+};
+
+/**
+ * Saves a new user in the database.
+ * @param {Object} user - The user object to save.
+ * @returns {Object|null} - The newly created user object, or null on failure.
+ */
+const saveUser = async (user) => {
+  if (!user || !user.email) {
+    throw new Error('Valid user data is required');
+  }
+
+  try {
+    return await userRepository.saveUser(user);
+  } catch (error) {
+    console.error('Error saving user:', error.message);
+    throw new Error('Failed to save user. Please try again later.');
+  }
+};
+
 
 module.exports = {
   retrieveUserByEmail,
   sendEmailOTP,
   verifyEmailOTP,
-  saveUser
+  saveUser,
 };

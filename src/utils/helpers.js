@@ -1,13 +1,8 @@
-const crypto = require('crypto');
-
+/**
+ * Generate a 6-digit OTP
+ */
 const generateOTP = () => {
-    return crypto.randomInt(100000, 999999).toString(); // 6-digit OTP
+  return Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit OTP
 };
 
-const isOTPExpired = (otpTimestamp) => {
-    const expiryTime = parseInt(process.env.OTP_EXPIRY_MINUTES) || 5;
-    const currentTime = new Date().getTime();
-    return currentTime - otpTimestamp > expiryTime * 60 * 1000; // Convert to milliseconds
-};
-
-module.exports = { generateOTP, isOTPExpired };
+module.exports = { generateOTP };
