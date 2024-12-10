@@ -1,6 +1,7 @@
 require('dotenv').config();
 const userRepository = require('../repositories/userRepository');
 const emailService = require('./emailService');
+const otpService = require('./otpService')
 
 /**
  * Retrieves a user by their email.
@@ -19,13 +20,18 @@ const retrieveUserByEmail = async (email) => {
  * @param {string} email - The recipient's email address.
  * @returns {Object} - The response from the email service.
  */
-const sendEmailOTP = async (email) => {
+const sendEmailOTP = async (email, otp) => {
   if (!email) {
     throw new Error('Email is required for sending OTP');
   }
+
+  if (!otp){
+    throw new Error("Unable to generate OTP")
+  }
   
   try {
-    const response = await emailService.sendMail(email);
+
+    const response = await emailService.sendMail(email, otp);
     console.log('Email sent response:', response);
     return { success: true, message: 'OTP sent successfully' };
   } catch (error) {
@@ -46,8 +52,8 @@ const verifyEmailOTP = async (email, otp) => {
   }
 
   // Placeholder logic for OTP verification. Replace with actual validation logic.
-  const isValidOTP = otp === '123456'; // Example: Compare with a stored OTP or service.
-  console.log(`Verifying OTP for ${email}: ${isValidOTP}`);
+  const isValidOTP = otpService.validateOTP(email, otp)
+  
   return isValidOTP;
 };
 

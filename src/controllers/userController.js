@@ -1,6 +1,7 @@
 const userService = require('../services/userService');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 const { v4: uuidv4 } = require('uuid');
+const otpService = require('../services/otpService.js')
 
 const getUserByEmail = async (req, res) => {
   try {
@@ -31,7 +32,14 @@ const sendEmailOTP = async (req, res) => {
       return successResponse(res, 0, "Email is required");
     }
 
-    const otpSent = await userService.sendEmailOTP(email);
+    
+    const otp = await otpService.generateOtp(email)
+
+    if (!otp.success) {
+      return successResponse(res, 0, "Failed to generate OTP");
+    }
+
+    const otpSent = await userService.sendEmailOTP(email, otp.otp);
 
     if (!otpSent) {
       return successResponse(res, 0, "Failed to send OTP");
@@ -46,7 +54,7 @@ const sendEmailOTP = async (req, res) => {
 
 const verifyEmailOTP = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp } = req.authData;
 
     if (!email || !otp) {
       return successResponse(res, 0, "Email and OTP are required");
@@ -54,11 +62,11 @@ const verifyEmailOTP = async (req, res) => {
 
     const verified = await userService.verifyEmailOTP(email, otp);
 
-    if (!verified) {
-      return successResponse(res, 0, "OTP not verified");
+    if (!verified.valid) {
+      return successResponse(res, 0, verified.message);
     }
 
-    return successResponse(res, 1, "OTP verified successfully");
+    return successResponse(res, 1, verified.message);
   } catch (error) {
     console.error("Error in verifyEmailOTP:", error);
     return errorResponse(res, "Unable to verify OTP", 500);
