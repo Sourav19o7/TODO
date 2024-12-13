@@ -4,7 +4,7 @@ const taskService = require('../services/taskService');
  * Controller for creating a new task.
  * Handles request validation and error responses.
  */
-exports.createTask = async (req, res) => {
+const createTask = async (req, res) => {
   const { title, description, isCompleted } = req.body;
 
   // Validate the input
@@ -22,4 +22,20 @@ exports.createTask = async (req, res) => {
     console.error('Error in createTask:', error.message);
     res.status(500).json({ error: 'Failed to create task' });
   }
+};
+
+const getAllTasks = async (req, res) => {
+  try {
+    const {user_id} = req.authData;
+    const tasks = await taskService.getAllTasks(user_id);
+    res.status(200).json({id : 1, message : "Tasks Fetched", data : tasks});
+  } catch (error) {
+    console.error('Error in getAllTasks:', error.message);
+    res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+}
+
+module.exports = {
+  createTask,
+  getAllTasks,
 };

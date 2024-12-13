@@ -2,6 +2,7 @@ require('dotenv').config();
 const verifyToken = require('./middleware/authMiddleware');
 const express = require('express');
 const userRoutes = require('./routes/userRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
@@ -28,6 +29,7 @@ color.setTheme({
 
 app.use(verifyToken)
 app.use('/user', userRoutes);
+app.use('/task', taskRoutes);
 
 const PORT = process.env.PORT || 3000;
 
