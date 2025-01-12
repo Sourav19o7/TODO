@@ -5,7 +5,7 @@ const path = require("path");
 dotenv.config();
 
 // Configuration
-const REPO_PATH = "."; // Replace with your repo path
+const REPO_PATH = "src/scheduler/"; // Replace with your repo path
 const COMMIT_MESSAGE = "Daily commit: "; // Default commit message
 const GITHUB_USERNAME = "Sourav19o7"; // Replace with your GitHub username
 const GITHUB_TOKEN = process.env.PERSONAL_ACCESS_TOKEN; // Replace with your GitHub token
@@ -22,7 +22,7 @@ async function makeCommit() {
     const git = simpleGit(REPO_PATH);
 
     // Step 1: Create or update a dummy file
-    const filePath = path.join(REPO_PATH, "/src/scheduler/daily_update.txt");
+    const filePath = path.join(REPO_PATH, "daily_update.txt");
     const timestamp = new Date().toISOString();
     fs.appendFileSync(filePath, `Update on ${timestamp}\n`);
 
