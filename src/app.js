@@ -1,4 +1,6 @@
 require('dotenv').config();
+const makeCommit = require('./scheduler/commitScheduler')
+const schedule = require("node-schedule");
 const verifyToken = require('./middleware/authMiddleware');
 const express = require('express');
 const userRoutes = require('./routes/userRoutes');
@@ -36,3 +38,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+// Schedule the job to run daily at 12:00 PM
+schedule.scheduleJob("* * * * *", makeCommit); // Runs at 12:00 PM every day
