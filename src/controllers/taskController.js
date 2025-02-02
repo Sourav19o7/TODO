@@ -5,10 +5,12 @@ const taskService = require('../services/taskService');
  * Handles request validation and error responses.
  */
 const createTask = async (req, res) => {
-  const { title, description, isCompleted } = req.body;
+  const { user_id, title, description, timeline, assignee, completed = false } = req.authData;
+
+  console.log("Auth Data", req.authData);
 
   // Validate the input
-  if (!title || typeof isCompleted === 'undefined') {
+  if (!title || typeof completed === 'undefined') {
     return res.status(400).json({
       error: 'Validation Error: "title" and "isCompleted" fields are required.',
     });
@@ -16,7 +18,7 @@ const createTask = async (req, res) => {
 
   try {
     // Call the service layer to insert the task
-    const taskId = await taskService.createTask({ title, description, isCompleted });
+    const taskId = await taskService.createTask({ user_id, title, description, timeline, assignee, completed });
     res.status(201).json({ message: 'Task created successfully', taskId });
   } catch (error) {
     console.error('Error in createTask:', error.message);
