@@ -29,7 +29,8 @@ const getAllTasks = async (user_id) => {
   const { data, error } = await supabase
     .from('tasks')
     .select('*')
-    .eq('user_id', user_id);
+    .eq('user_id', user_id)
+    .order('timeline', { ascending: true });
 
   if (error) {
     throw new Error(error.message);

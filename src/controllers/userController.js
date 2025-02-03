@@ -60,7 +60,7 @@ const verifyEmailOTP = async (req, res) => {
       return successResponse(res, 0, "Email and OTP are required");
     }
 
-    const verified = await userService.verifyEmailOTP(email, otp);
+    const verified = userService.verifyEmailOTP(email, otp);
 
     if (!verified.valid) {
       return successResponse(res, 0, verified.message);

@@ -37,6 +37,29 @@ const getAllTasks = async (user_id) => {
 };
 
 /**
+ * Service for toggling the completion status of a task.
+ * @param {string} taskId - The ID of the task to update.
+ */
+const toggleTaskCompletion = async (taskId) => {
+  if (!taskId) {
+    throw new Error('Task ID is required');
+  }
+
+  try {
+    const task = await taskRepository.getTaskById(taskId);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const updatedTask = await taskRepository.updateTask(taskId, { completed: !task.completed });
+    return updatedTask;
+  } catch (error) {
+    console.error('Error in taskService.toggleTaskCompletion:', error.message);
+    throw new Error('Failed to update task completion status. Please try again later.');
+  }
+}
+
+/**
  * Service for fetching a task by ID.
  * @param {string} id - The ID of the task.
  * @returns {Object|null} - The task object if found, otherwise null.
@@ -100,4 +123,5 @@ module.exports = {
   getTaskById,
   updateTask,
   deleteTask,
+  toggleTaskCompletion,
 };

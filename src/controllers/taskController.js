@@ -37,7 +37,26 @@ const getAllTasks = async (req, res) => {
   }
 }
 
+const toggleTaskCompletion = async (req, res) => {
+  const { taskId } = req.authData;
+
+  if (!taskId) {
+    return res.status(400).json({
+      error: 'Validation Error: "taskId" is required.',
+    });
+  }
+
+  try {
+    const updatedTask = await taskService.toggleTaskCompletion(taskId);
+    res.status(200).json({ message: 'Task updated successfully', updatedTask });
+  } catch (error) {
+    console.error('Error in toggleTaskCompletion:', error.message);
+    res.status(500).json({ error: 'Failed to update task' });
+  }
+}
+
 module.exports = {
   createTask,
   getAllTasks,
+  toggleTaskCompletion
 };
