@@ -42,6 +42,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.11.4",
     "node-schedule": "^2.1.1",
+    "openai": "^4.82.0",
     "resend": "^4.0.1",
     "scoop": "^0.0.2",
     "simple-git": "^3.27.0",

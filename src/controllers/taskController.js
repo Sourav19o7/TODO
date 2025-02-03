@@ -55,8 +55,26 @@ const toggleTaskCompletion = async (req, res) => {
   }
 }
 
+const getPlan = async (req, res) => {
+  try {
+    const {user_id, problem, timeline} = req.authData;
+
+    if (!problem || !timeline) {
+      return res.status(400).json({ error: "Problem and deadline are required" });
+    }
+
+    const plan = await taskService.getPlan(user_id, problem, timeline);
+    
+    res.status(200).json({id : 1, message : "Plan Fetched", data : plan});
+  } catch (error) {
+    console.error('Error in getPlan:', error.message);
+    res.status(500).json({ error: 'Failed to fetch plan' });
+  }
+}
+
 module.exports = {
   createTask,
   getAllTasks,
-  toggleTaskCompletion
+  toggleTaskCompletion,
+  getPlan
 };

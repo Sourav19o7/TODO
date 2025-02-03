@@ -6,5 +6,6 @@ const taskController = require('../controllers/taskController');
 router.post('/save', taskController.createTask);
 router.get('/get', taskController.getAllTasks);
 router.get('/completion', taskController.toggleTaskCompletion);
+router.get('/plan', taskController.getPlan);
 
 module.exports = router;

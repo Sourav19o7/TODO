@@ -1,4 +1,5 @@
 // taskService.js
+const generatePlan = require('../openAI/plan');
 const taskRepository = require('../repositories/taskRepository');
 
 /**
@@ -56,6 +57,24 @@ const toggleTaskCompletion = async (taskId) => {
   } catch (error) {
     console.error('Error in taskService.toggleTaskCompletion:', error.message);
     throw new Error('Failed to update task completion status. Please try again later.');
+  }
+}
+
+/**
+ * Service for generate a plan for a given user using openAI
+ */
+const getPlan = async (user_id, problem, timeline) => {
+  if (!user_id || !problem || !timeline) {
+    throw new Error('User ID, problem, and timeline are required');
+  }
+
+  try {
+    // Call the openAI API to generate a plan
+    const plan = await generatePlan(problem, timeline);
+    return plan;
+  } catch (error) {
+    console.error('Error in taskService.getPlan:', error.message);
+    throw new Error('Failed to generate plan. Please try again later.');
   }
 }
 
@@ -124,4 +143,5 @@ module.exports = {
   updateTask,
   deleteTask,
   toggleTaskCompletion,
+  getPlan
 };
