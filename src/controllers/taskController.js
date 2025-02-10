@@ -37,6 +37,23 @@ const getAllTasks = async (req, res) => {
   }
 }
 
+const getTaskById = async (req, res) => {
+  const { taskId } = req.authData;
+
+  if (!taskId) {
+    return res.status(400).json({
+      error: 'Validation Error: "taskId" is required.',
+    });
+  }
+
+  try {
+    const task = await taskService.getTaskById(taskId);
+    res.status(200).json({ id : 1, message: 'Task fetched successfully', data : [task] });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch task' });
+  }
+}
+
 const toggleTaskCompletion = async (req, res) => {
   const { taskId } = req.authData;
 
@@ -75,6 +92,7 @@ const getPlan = async (req, res) => {
 module.exports = {
   createTask,
   getAllTasks,
+  getTaskById,
   toggleTaskCompletion,
   getPlan
 };
