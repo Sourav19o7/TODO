@@ -41,4 +41,4 @@ app.listen(PORT, () => {
 
 
 // Schedule the job to run daily at 12:00 PM
-schedule.scheduleJob("* * * * *", makeCommit); // Runs at 12:00 PM every day
+schedule.scheduleJob("0 * * * *", makeCommit); // Runs at 12:00 PM every day
