@@ -1,48 +1,44 @@
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 const simpleGit = require("simple-git");
 const fs = require("fs");
 const path = require("path");
+
 dotenv.config();
 
 // Configuration
-const REPO_PATH = "src/scheduler/"; // Replace with your repo path
-const COMMIT_MESSAGE = "Daily commit: "; // Default commit message
-const GITHUB_USERNAME = "Sourav19o7"; // Replace with your GitHub username
-const GITHUB_TOKEN = process.env.PERSONAL_ACCESS_TOKEN; // Replace with your GitHub token
-const BRANCH_NAME = "main"; // Replace with your branch name if not 'main'
+const REPO_PATH = "./"; // Root of the repo
+const FILE_PATH = path.join(REPO_PATH, "src/scheduler/daily_update.txt");
+const COMMIT_MESSAGE = "Daily commit: ";
+const BRANCH_NAME = "main"; // Change if needed
 
 // Function to make a commit
 async function makeCommit() {
   try {
-
-    if (!fs.existsSync(REPO_PATH)) {
-        throw new Error(`Repository path does not exist: ${REPO_PATH}`);
-      }
-
     const git = simpleGit(REPO_PATH);
 
-    // Step 1: Create or update a dummy file
-    const filePath = path.join(REPO_PATH, "daily_update.txt");
+    if (!fs.existsSync(FILE_PATH)) {
+      throw new Error(`File does not exist: ${FILE_PATH}`);
+    }
+
+    // Step 1: Append timestamp to the file
     const timestamp = new Date().toISOString();
-    fs.appendFileSync(filePath, `Update on ${timestamp}\n`);
+    fs.appendFileSync(FILE_PATH, `Update on ${timestamp}\n`);
 
     // Step 2: Stage changes
-    await git.add(".");
+    await git.add(FILE_PATH);
 
     // Step 3: Commit changes
-    const commitMsg = `${COMMIT_MESSAGE}${timestamp.split("T")[0]}`;
+    const commitMsg = `${COMMIT_MESSAGE}${timestamp}`;
     await git.commit(commitMsg);
 
     // Step 4: Push changes
-    const remoteUrl = `https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${path.basename(
-      REPO_PATH
-    )}.git`;
-    await git.push(remoteUrl, BRANCH_NAME);
+    await git.pull("origin", BRANCH_NAME); // Ensure the latest version
+    await git.push("origin", BRANCH_NAME);
 
     console.log(`Commit pushed successfully: ${commitMsg}`);
   } catch (error) {
     console.error("Error making commit:", error);
   }
-};
+}
 
 module.exports = makeCommit;
