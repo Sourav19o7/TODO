@@ -7,7 +7,7 @@ dotenv.config();
 
 // Configuration
 const REPO_PATH = "./"; // Root of the repo
-const FILE_PATH = path.join(REPO_PATH, "src/scheduler/daily_update.txt");
+const FILE_PATH = path.join(REPO_PATH, "daily_update.txt");
 const COMMIT_MESSAGE = "Daily commit: ";
 const BRANCH_NAME = "main"; // Change if needed
 
@@ -15,7 +15,7 @@ const BRANCH_NAME = "main"; // Change if needed
 const GIT_USER_NAME = process.env.GIT_USER_NAME || "Sourav19o7";
 const GIT_USER_EMAIL = process.env.GIT_USER_EMAIL || "sourav.dey0147@gmail.com";
 const GITHUB_TOKEN = process.env.PERSONAL_ACCESS_TOKEN;
-const REPO_URL = "https://github.com/Sourav19o7/TODO.git";
+const REPO_URL = "https://github.com/Sourav19o7/TODO-App.git";
 
 // Get authenticated URL
 function getAuthenticatedUrl() {
