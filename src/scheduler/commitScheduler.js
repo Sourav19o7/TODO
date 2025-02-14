@@ -11,37 +11,70 @@ const FILE_PATH = path.join(REPO_PATH, "src/scheduler/daily_update.txt");
 const COMMIT_MESSAGE = "Daily commit: ";
 const BRANCH_NAME = "main"; // Change if needed
 
-// Function to make a commit
 async function makeCommit() {
   try {
     const git = simpleGit(REPO_PATH);
 
     if (!fs.existsSync(FILE_PATH)) {
-      throw new Error(`File does not exist: ${FILE_PATH}`);
+      console.error(`❌ File does not exist: ${FILE_PATH}`);
+      return;
     }
 
-    // Step 1: Append timestamp to the file
+    // Step 1: Ensure the latest version is pulled to prevent conflicts
+    console.log("🔄 Pulling latest changes...");
+    await git.fetch();
+    await git.pull("origin", BRANCH_NAME);
+
+    // Step 2: Append timestamp to the file
     const timestamp = new Date().toISOString();
     fs.appendFileSync(FILE_PATH, `Update on ${timestamp}\n`);
+    console.log(`✅ File updated: ${FILE_PATH}`);
 
-    // Step 2: Stage changes
+    // Step 3: Stage changes
     await git.add(FILE_PATH);
+    console.log("📌 Changes staged.");
 
-    // Step 3: Set user details
-    await git.addConfig('user.name', 'Sourav Dey');
-    await git.addConfig('user.email', 'sourav.dey0147@gmail.com');
+    // Step 4: Set user details
+    await git.addConfig("user.name", "Sourav Dey");
+    await git.addConfig("user.email", "sourav.dey0147@gmail.com");
 
-    // Step 4: Commit changes
+    // Step 5: Commit changes
     const commitMsg = `${COMMIT_MESSAGE}${timestamp}`;
     await git.commit(commitMsg);
+    console.log(`✅ Commit created: ${commitMsg}`);
 
-    // Step 5: Push changes
-    await git.pull("origin", BRANCH_NAME); // Ensure the latest version
+    // Step 6: Push changes
     await git.push("origin", BRANCH_NAME);
-
-    console.log(`Commit pushed successfully: ${commitMsg}`);
+    console.log("🚀 Commit pushed successfully.");
   } catch (error) {
-    console.error("Error making commit:", error);
+    console.error("❌ Error making commit:", error);
+
+    // If there is a merge conflict, attempt to resolve
+    if (error.message.includes("CONFLICT")) {
+      console.log("⚠️ Merge conflict detected. Trying to resolve...");
+      await resolveMergeConflict();
+    }
+  }
+}
+
+// Handle merge conflicts by stashing, pulling, and reapplying changes
+async function resolveMergeConflict() {
+  try {
+    const git = simpleGit(REPO_PATH);
+
+    console.log("🔄 Stashing local changes...");
+    await git.stash();
+
+    console.log("🔄 Pulling latest changes...");
+    await git.pull("origin", BRANCH_NAME);
+
+    console.log("🔄 Applying stashed changes...");
+    await git.stash(["pop"]);
+
+    console.log("✅ Retry committing...");
+    await makeCommit();
+  } catch (err) {
+    console.error("❌ Merge conflict resolution failed:", err);
   }
 }
 
