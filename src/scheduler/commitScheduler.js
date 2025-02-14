@@ -59,54 +59,6 @@ async function setupGitConfig(git) {
     }
 }
 
-// Function to reconcile branches
-async function reconcileBranches(git) {
-    try {
-        console.log('Attempting to reconcile branches...');
-        
-        // Fetch latest changes
-        await git.fetch('origin', BRANCH_NAME);
-        
-        // Get current and remote HEADs
-        const localHead = await git.revparse(['HEAD']);
-        const remoteHead = await git.revparse([`origin/${BRANCH_NAME}`]);
-        
-        if (localHead !== remoteHead) {
-            console.log('Branches have diverged, attempting to reconcile...');
-            
-            // Save local changes
-            await git.stash(['save', 'Temporary stash before reconciliation']);
-            
-            try {
-                // Reset to remote state
-                await git.reset(['--hard', `origin/${BRANCH_NAME}`]);
-                
-                // Apply stashed changes
-                const stashList = await git.stash(['list']);
-                if (stashList) {
-                    await git.stash(['pop']);
-                }
-                
-                // Stage all changes
-                await git.add('.');
-                
-                console.log('Branch reconciliation successful');
-            } catch (error) {
-                console.error('Error during reconciliation:', error.message);
-                // Attempt to recover stashed changes
-                const stashList = await git.stash(['list']);
-                if (stashList) {
-                    await git.stash(['pop']);
-                }
-                throw error;
-            }
-        }
-    } catch (error) {
-        console.error('Error reconciling branches:', error.message);
-        throw error;
-    }
-}
-
 // Function to make a commit
 async function makeCommit() {
     let git;
@@ -118,33 +70,28 @@ async function makeCommit() {
         // Setup Git configuration
         await setupGitConfig(git);
 
-        // Create directory if it doesn't exist
+        // Pull latest changes with rebase to avoid merge conflicts
+        await git.pull('origin', BRANCH_NAME, ['--rebase']);
+
+        // Create directory and file if they don't exist
         const dir = path.dirname(FILE_PATH);
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
-
-        // Create file if it doesn't exist
         if (!fs.existsSync(FILE_PATH)) {
             fs.writeFileSync(FILE_PATH, '# Daily Updates Log\n\n');
         }
 
-        // Step 1: Append timestamp to the file
+        // Append timestamp to the file
         const timestamp = new Date().toISOString();
         fs.appendFileSync(FILE_PATH, `Update on ${timestamp}\n`);
 
-        // Step 2: Stage changes
+        // Stage and commit changes
         await git.add(FILE_PATH);
-
-        // Step 3: Commit changes
         const commitMsg = `${COMMIT_MESSAGE}${timestamp}`;
         await git.commit(commitMsg);
 
-        // Step 4: Reconcile branches before pushing
-        await reconcileBranches(git);
-
-        // Step 5: Pull and Push changes
-        await git.pull('origin', BRANCH_NAME)
+        // Push changes
         await git.push('origin', BRANCH_NAME);
         
         console.log(`Commit pushed successfully: ${commitMsg}`);
