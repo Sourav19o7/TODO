@@ -35,7 +35,7 @@ async function makeCommit() {
     console.log("📌 Changes staged.");
 
     // Step 4: Set user details
-    await git.addConfig("user.name", "Sourav Dey");
+    await git.addConfig("user.name", "Sourav19o7");
     await git.addConfig("user.email", "sourav.dey0147@gmail.com");
 
     // Step 5: Commit changes
@@ -43,7 +43,19 @@ async function makeCommit() {
     await git.commit(commitMsg);
     console.log(`✅ Commit created: ${commitMsg}`);
 
-    // Step 6: Push changes
+    // Step 6: Set HTTPS remote with authentication
+    const GIT_USER = 'Sourav19o7';
+    const GIT_PAT = process.env.PERSONAL_ACCESS_TOKEN;
+    const GITHUB_REPO = 'Sourav19o7/TODO'; // Format: username/repo-name
+
+    if (!GIT_USER || !GIT_PAT || !GITHUB_REPO) {
+      throw new Error("Missing required environment variables: GIT_USER, GIT_PAT, or GITHUB_REPO");
+    }
+
+    const remoteUrl = `https://${GIT_USER}:${GIT_PAT}@github.com/${GITHUB_REPO}.git`;
+    await git.remote(["set-url", "origin", remoteUrl]);
+
+    // Step 7: Push changes
     await git.push("origin", BRANCH_NAME);
     console.log("🚀 Commit pushed successfully.");
   } catch (error) {
