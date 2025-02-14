@@ -11,10 +11,18 @@ const FILE_PATH = path.join(REPO_PATH, "src/scheduler/daily_update.txt");
 const COMMIT_MESSAGE = "Daily commit: ";
 const BRANCH_NAME = "main"; // Change if needed
 
+// Git author configuration - should be set in environment variables
+const GIT_USER_NAME = process.env.GIT_USER_NAME || "Sourav19o7";
+const GIT_USER_EMAIL = process.env.GIT_USER_EMAIL || "sourav.dey0147@gmail.com";
+
 // Function to make a commit
 async function makeCommit() {
   try {
     const git = simpleGit(REPO_PATH);
+
+    // Configure Git author identity for this repository
+    await git.addConfig('user.name', GIT_USER_NAME, false, 'local');
+    await git.addConfig('user.email', GIT_USER_EMAIL, false, 'local');
 
     if (!fs.existsSync(FILE_PATH)) {
       throw new Error(`File does not exist: ${FILE_PATH}`);
@@ -37,7 +45,9 @@ async function makeCommit() {
 
     console.log(`Commit pushed successfully: ${commitMsg}`);
   } catch (error) {
-    console.error("Error making commit:", error);
+    console.error("Error making commit:", error.message);
+    // Log the full error object for debugging
+    console.debug("Full error details:", error);
   }
 }
 
