@@ -143,7 +143,8 @@ async function makeCommit() {
         // Step 4: Reconcile branches before pushing
         await reconcileBranches(git);
 
-        // Step 5: Push changes
+        // Step 5: Pull and Push changes
+        await git.pull('origin', BRANCH_NAME)
         await git.push('origin', BRANCH_NAME);
         
         console.log(`Commit pushed successfully: ${commitMsg}`);
