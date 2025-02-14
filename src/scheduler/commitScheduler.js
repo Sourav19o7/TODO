@@ -6,42 +6,38 @@ const path = require("path");
 dotenv.config();
 
 // Configuration
-const REPO_PATH = "./";
+const REPO_PATH = "./"; // Root of the repo
 const FILE_PATH = path.join(REPO_PATH, "src/scheduler/daily_update.txt");
 const COMMIT_MESSAGE = "Daily commit: ";
-const BRANCH_NAME = "main";
+const BRANCH_NAME = "main"; // Change if needed
 
+// Function to make a commit
 async function makeCommit() {
   try {
     const git = simpleGit(REPO_PATH);
 
-    // Ensure repo URL is set correctly
-    const repoURL = `https://Sourav19o7:${process.env.PERSONAL_ACCESS_TOKEN}@github.com/Sourav19o7/TODO.git`;
-    await git.remote(['set-url', 'origin', repoURL]);
+    if (!fs.existsSync(FILE_PATH)) {
+      throw new Error(`File does not exist: ${FILE_PATH}`);
+    }
 
-    // Ensure credentials are stored
-    await git.addConfig('credential.helper', 'store');
-    await git.addConfig('http.https://github.com/.extraheader', `AUTHORIZATION: basic ${Buffer.from(`Sourav19o7:${process.env.GIT_PAT}`).toString('base64')}`);
-
-    console.log("🔄 Pulling latest changes...");
-    await git.pull("origin", BRANCH_NAME);
-
-    // Append timestamp to the file
+    // Step 1: Append timestamp to the file
     const timestamp = new Date().toISOString();
     fs.appendFileSync(FILE_PATH, `Update on ${timestamp}\n`);
 
-    // Stage and commit changes
+    // Step 2: Stage changes
     await git.add(FILE_PATH);
-    await git.addConfig('user.name', 'Sourav Dey');
-    await git.addConfig('user.email', 'sourav.dey0147@gmail.com');
+
+    // Step 3: Commit changes
     const commitMsg = `${COMMIT_MESSAGE}${timestamp}`;
     await git.commit(commitMsg);
 
-    // Push changes
+    // Step 4: Push changes
+    await git.pull("origin", BRANCH_NAME); // Ensure the latest version
     await git.push("origin", BRANCH_NAME);
-    console.log(`✅ Commit pushed successfully: ${commitMsg}`);
+
+    console.log(`Commit pushed successfully: ${commitMsg}`);
   } catch (error) {
-    console.error("❌ Error making commit:", error);
+    console.error("Error making commit:", error);
   }
 }
 
