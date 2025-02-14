@@ -8,7 +8,6 @@ dotenv.config();
 // Configuration
 const REPO_PATH = "./"; // Root of the repo
 const FILE_PATH = path.join(REPO_PATH, "src/scheduler/daily_update.txt");
-const COMMIT_MESSAGE = "Daily commit: ";
 const BRANCH_NAME = "main"; // Change if needed
 
 // Git configuration
@@ -61,45 +60,35 @@ async function setupGitConfig(git) {
 
 // Function to make a commit
 async function makeCommit() {
-    let git;
-    
     try {
-        // Initialize git
-        git = initGit();
-        
-        // Setup Git configuration
-        await setupGitConfig(git);
-
-        // Pull latest changes with rebase to avoid merge conflicts
-        await git.pull('origin', BRANCH_NAME, ['--rebase']);
-
-        // Create directory and file if they don't exist
-        const dir = path.dirname(FILE_PATH);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        if (!fs.existsSync(FILE_PATH)) {
-            fs.writeFileSync(FILE_PATH, '# Daily Updates Log\n\n');
-        }
-
-        // Append timestamp to the file
-        const timestamp = new Date().toISOString();
-        fs.appendFileSync(FILE_PATH, `Update on ${timestamp}\n`);
-
-        // Stage and commit changes
-        await git.add(FILE_PATH);
-        const commitMsg = `${COMMIT_MESSAGE}${timestamp}`;
-        await git.commit(commitMsg);
-
-        // Push changes
-        await git.push('origin', BRANCH_NAME);
-        
-        console.log(`Commit pushed successfully: ${commitMsg}`);
+      const git = initGit();
+      console.log("Git initialized.");
+  
+      await setupGitConfig(git);
+      console.log("Git config set.");
+  
+      console.log("Pulling changes...");
+      await git.pull('origin', BRANCH_NAME, ['--rebase']);
+      console.log("Pull complete.");
+  
+      // Update file
+      const timestamp = new Date().toISOString();
+      fs.appendFileSync(FILE_PATH, `Update on ${timestamp}\n`);
+      console.log("File updated.");
+  
+      // Stage and commit
+      await git.add(FILE_PATH);
+      console.log("Changes staged.");
+      await git.commit(`Daily commit: ${timestamp}`);
+      console.log("Changes committed.");
+  
+      // Push
+      await git.push('origin', BRANCH_NAME);
+      console.log("Pushed to remote.");
     } catch (error) {
-        console.error("Error making commit:", error.message);
-        console.debug("Full error details:", error);
-        throw error;
+      console.error("FULL ERROR:", error);
+      throw error;
     }
-}
+  }
 
 module.exports = makeCommit;
