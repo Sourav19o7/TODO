@@ -59,6 +59,54 @@ async function setupGitConfig(git) {
     }
 }
 
+// Function to reconcile branches
+async function reconcileBranches(git) {
+    try {
+        console.log('Attempting to reconcile branches...');
+        
+        // Fetch latest changes
+        await git.fetch('origin', BRANCH_NAME);
+        
+        // Get current and remote HEADs
+        const localHead = await git.revparse(['HEAD']);
+        const remoteHead = await git.revparse([`origin/${BRANCH_NAME}`]);
+        
+        if (localHead !== remoteHead) {
+            console.log('Branches have diverged, attempting to reconcile...');
+            
+            // Save local changes
+            await git.stash(['save', 'Temporary stash before reconciliation']);
+            
+            try {
+                // Reset to remote state
+                await git.reset(['--hard', `origin/${BRANCH_NAME}`]);
+                
+                // Apply stashed changes
+                const stashList = await git.stash(['list']);
+                if (stashList) {
+                    await git.stash(['pop']);
+                }
+                
+                // Stage all changes
+                await git.add('.');
+                
+                console.log('Branch reconciliation successful');
+            } catch (error) {
+                console.error('Error during reconciliation:', error.message);
+                // Attempt to recover stashed changes
+                const stashList = await git.stash(['list']);
+                if (stashList) {
+                    await git.stash(['pop']);
+                }
+                throw error;
+            }
+        }
+    } catch (error) {
+        console.error('Error reconciling branches:', error.message);
+        throw error;
+    }
+}
+
 // Function to make a commit
 async function makeCommit() {
     let git;
@@ -92,8 +140,10 @@ async function makeCommit() {
         const commitMsg = `${COMMIT_MESSAGE}${timestamp}`;
         await git.commit(commitMsg);
 
-        // Step 4: Pull and Push changes directly with authenticated URL
-        await git.pull('origin', BRANCH_NAME)
+        // Step 4: Reconcile branches before pushing
+        await reconcileBranches(git);
+
+        // Step 5: Push changes
         await git.push('origin', BRANCH_NAME);
         
         console.log(`Commit pushed successfully: ${commitMsg}`);
