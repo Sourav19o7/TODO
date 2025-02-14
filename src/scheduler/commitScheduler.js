@@ -92,7 +92,8 @@ async function makeCommit() {
         const commitMsg = `${COMMIT_MESSAGE}${timestamp}`;
         await git.commit(commitMsg);
 
-        // Step 4: Push changes directly with authenticated URL
+        // Step 4: Pull and Push changes directly with authenticated URL
+        await git.pull('origin', BRANCH_NAME)
         await git.push('origin', BRANCH_NAME);
         
         console.log(`Commit pushed successfully: ${commitMsg}`);
