@@ -27,11 +27,15 @@ async function makeCommit() {
     // Step 2: Stage changes
     await git.add(FILE_PATH);
 
-    // Step 3: Commit changes
+    // Step 3: Set user details
+    await git.addConfig('user.name', 'Sourav Dey');
+    await git.addConfig('user.email', 'sourav.dey0147@gmail.com');
+
+    // Step 4: Commit changes
     const commitMsg = `${COMMIT_MESSAGE}${timestamp}`;
     await git.commit(commitMsg);
 
-    // Step 4: Push changes
+    // Step 5: Push changes
     await git.pull("origin", BRANCH_NAME); // Ensure the latest version
     await git.push("origin", BRANCH_NAME);
 
